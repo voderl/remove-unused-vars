@@ -10,6 +10,21 @@ export function emptyArg2(arg1, arg2) {
   return arg1;
 }
 
+export function emptyArg3(arg1, arg2,) {
+  return arg1;
+}
+
+export function emptyArg4({
+  arg1,
+  arg2,
+}) {
+  return arg1;
+}
+
+export function emptyArg5([arg1, arg2,]) {
+  return arg1;
+}
+
 export function empty2(args, args2) {
   return null;
 }

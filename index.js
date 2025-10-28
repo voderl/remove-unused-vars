@@ -162,10 +162,34 @@ function removeUnusedVariables(results) {
 
         if (ts.isBindingElement(token.parent)) {
           const parameter = token.parent;
-          const start = parameter.getFullStart();
-          let end = parameter.getEnd();
-          if (parameter !== parameter.parent.elements.at(-1)) end = source.indexOf(',', end) + 1;
-          return { start, end };
+
+          const preToken = ts.findPrecedingToken(parameter.getFullStart(), sourceFile);
+          const nextToken = ts.findNextToken(parameter, sourceFile);
+
+          if (parameter === parameter.parent.elements.at(-1)) {
+            return {
+              start: preToken?.getText() === ',' ? preToken.getFullStart() : parameter.getFullStart(),
+              end: nextToken?.getText() === ',' ? nextToken.getEnd() : parameter.getEnd(),
+            };
+          }
+
+          if (preToken && nextToken && preToken.getText() === ',' && nextToken.getText() === ',') {
+            if (ts.isArrayBindingPattern(parameter.parent)) {
+              return {
+                start: parameter.getStart(),
+                end: parameter.getEnd(),
+              };
+            }
+            return {
+              start: parameter.getFullStart(),
+              end: nextToken.getEnd(),
+            };
+          }
+
+          return {
+            start: parameter.getFullStart(),
+            end: parameter.getEnd(),
+          };
         }
 
         if (ts.isParameter(token.parent)) {
@@ -179,10 +203,20 @@ function removeUnusedVariables(results) {
             }
           }
 
-          const start = parameter.getFullStart();
-          let end = parameter.getEnd();
-          if (parameter !== parameter.parent.parameters.at(-1)) end = source.indexOf(',', end) + 1;
-          return { start, end };
+          const preToken = ts.findPrecedingToken(parameter.getFullStart(), sourceFile);
+          const nextToken = ts.findNextToken(parameter, sourceFile);
+
+          if (parameter === parameter.parent.parameters.at(-1)) {
+            return {
+              start: preToken?.getText() === ',' ? preToken.getFullStart() : parameter.getFullStart(),
+              end: nextToken?.getText() === ',' ? nextToken.getEnd() : parameter.getEnd(),
+            };
+          }
+
+          return {
+            start: parameter.getFullStart(),
+            end: parameter.getEnd(),
+          };
         }
 
         if (ts.isImportClause(token.parent)) {

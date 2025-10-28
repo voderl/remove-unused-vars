@@ -4,7 +4,7 @@ const a = 1;
 
 [1,2,3].map(() => null);
 
-[1,2,3].map((a,) => a);
+[1,2,3].map((a) => a);
 
 function Hello() {
   return 2;
